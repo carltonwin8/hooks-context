@@ -1,4 +1,4 @@
-import React, { useState, useContext, useReducer } from "react";
+import React, { useState, useContext, useReducer, useCallback } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 
@@ -44,7 +44,8 @@ const Main = () => {
           explicabo?
         </p>
         <CountReducer />
-        <CountuseState />
+        <CountState />
+        <CountCallback />
       </main>
     </>
   );
@@ -69,13 +70,38 @@ const CountReducer = () => {
   );
 };
 
-const CountuseState = () => {
+let last;
+const CountState = () => {
   const [count, setCount] = useState(0);
   const inc = () => setCount(p => ++p);
   const dec = () => setCount(p => --p);
+  console.log(inc, last, last === inc);
+  last = inc;
+
   return (
     <p>
       <span onClick={inc}>-</span> {count} <span onClick={dec}>+</span> useState
+    </p>
+  );
+};
+/*
+ * In the example above inc is recreate on each render.
+ * In the example below inc is create on the first render and then depends
+ * on no "[]" state changing in future renders so is only created once.
+ */
+let last2;
+const CountCallback = () => {
+  const [count, setCount] = useState(0);
+  const inc = useCallback(() => setCount(p => ++p), []);
+  const dec = useCallback(() => setCount(p => --p), []);
+  // [] param say callback does not depend on any props so don't re-run
+  console.log(inc, last2, last2 === inc);
+  last2 = inc;
+
+  return (
+    <p>
+      <span onClick={inc}>-</span> {count} <span onClick={dec}>+</span>{" "}
+      useCallback
     </p>
   );
 };
